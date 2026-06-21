@@ -46,7 +46,7 @@ const MainApp = () => {
           setSelectedDie={rollState.setSelectedDie}
           currentResult={rollState.currentResult}
           isRolling={rollState.isRolling}
-          onRoll={rollState.rollSelected}
+          roll={rollState.roll}
         />
       </View>
 

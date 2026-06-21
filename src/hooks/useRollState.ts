@@ -12,9 +12,6 @@ export const useRollState = () => {
   const [isRolling, setIsRolling] = useState(false);
   const [currentResult, setCurrentResult] = useState<RollResult | null>(null);
 
-  // For custom mode
-  const [customMultiResults, setCustomMultiResults] = useState<RollResult | null>(null);
-
   // Persisted roll history (most recent first)
   const [history, setHistory] = useState<RollHistoryEntry[]>([]);
 
@@ -43,30 +40,27 @@ export const useRollState = () => {
     });
   }, []);
 
-  const rollSelected = useCallback(() => {
-    if (isRolling) return; // Prevent spamming
-    setIsRolling(true);
+  // Unified roll: count === 1 rolls a single die (percentile-aware for d100),
+  // count > 1 rolls and sums multiple dice of the same type.
+  const roll = useCallback(
+    (die: DieType, count: number) => {
+      if (isRolling) return; // Prevent spamming
+      const safeCount = Math.max(1, Math.min(20, count));
+      setIsRolling(true);
 
-    // Keep it spinning for ~700ms
-    setTimeout(() => {
-      const result = DiceRoller.rollSingle(selectedDie);
-      setCurrentResult(result);
-      recordRoll(result, 1);
-      setIsRolling(false);
-    }, 700);
-  }, [selectedDie, isRolling, recordRoll]);
-
-  const rollMultiple = useCallback((die: DieType, count: number) => {
-    if (isRolling) return;
-    setIsRolling(true);
-
-    setTimeout(() => {
-      const result = DiceRoller.rollMultiple(die, count);
-      setCustomMultiResults(result);
-      recordRoll(result, count);
-      setIsRolling(false);
-    }, 700);
-  }, [isRolling, recordRoll]);
+      // Keep it spinning for ~700ms
+      setTimeout(() => {
+        const result =
+          safeCount === 1
+            ? DiceRoller.rollSingle(die)
+            : DiceRoller.rollMultiple(die, safeCount);
+        setCurrentResult(result);
+        recordRoll(result, safeCount);
+        setIsRolling(false);
+      }, 700);
+    },
+    [isRolling, recordRoll]
+  );
 
   const clearHistory = useCallback(() => {
     setHistory([]);
@@ -78,9 +72,7 @@ export const useRollState = () => {
     setSelectedDie,
     isRolling,
     currentResult,
-    customMultiResults,
-    rollSelected,
-    rollMultiple,
+    roll,
     history,
     clearHistory,
   };

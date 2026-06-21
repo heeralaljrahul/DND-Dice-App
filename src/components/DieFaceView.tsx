@@ -110,7 +110,11 @@ export const DieFaceView: React.FC<DieFaceViewProps> = ({
 
   return (
     <Animated.View style={[styles.container, { width: size, height: size }, animatedStyle]}>
-      <Text style={[styles.numberText, { color: numberColor, fontSize: size * 0.7 }]}>
+      <Text
+        style={[styles.numberText, { color: numberColor, fontSize: size * 0.7, maxWidth: size * 1.6 }]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+      >
         {displayValue}
       </Text>
     </Animated.View>
