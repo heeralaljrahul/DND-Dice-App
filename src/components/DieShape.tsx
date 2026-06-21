@@ -55,11 +55,10 @@ export const DieShape: React.FC<DieShapeProps> = ({ dieType, size, color }) => {
         </Svg>
       );
     case 100:
-      // Two d10 kites side by side
+      // Circle (percentile)
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
-          <Polygon points="30,15 50,35 30,75 10,35" fill={color} />
-          <Polygon points="70,15 90,35 70,75 50,35" fill={color} />
+          <Circle cx="50" cy="50" r="45" fill={color} />
         </Svg>
       );
     default:

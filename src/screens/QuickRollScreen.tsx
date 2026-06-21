@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, Text } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { DieFaceView } from '../components/DieFaceView';
+import { DieShape } from '../components/DieShape';
 import { DieType, RollResult, getDieName } from '../models/DieType';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -10,7 +11,6 @@ interface QuickRollScreenProps {
   currentResult: RollResult | null;
   isRolling: boolean;
   onRoll: () => void;
-  onCustomSelected: () => void; // Will trigger mode change or prompt
 }
 
 const STANDARD_DICE: DieType[] = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100'];
@@ -21,71 +21,44 @@ export const QuickRollScreen: React.FC<QuickRollScreenProps> = ({
   currentResult,
   isRolling,
   onRoll,
-  onCustomSelected,
 }) => {
   const { colors } = useTheme();
+  const label = `1${getDieName(selectedDie)}`;
 
   return (
     <View style={styles.container}>
       <View style={styles.centerStage}>
-        <TouchableOpacity 
-          activeOpacity={0.8} 
-          onPress={onRoll}
-          disabled={isRolling}
-        >
-          <DieFaceView 
-            dieType={selectedDie} 
+        <Text style={[styles.dieLabel, { color: colors.textSecondary }]}>{label}</Text>
+        <TouchableOpacity activeOpacity={0.8} onPress={onRoll} disabled={isRolling}>
+          <DieFaceView
+            dieType={selectedDie}
             value={currentResult?.total ?? getSidesFromDie(selectedDie)}
-            components={currentResult?.components}
-            isRolling={isRolling} 
-            size={180} 
+            isRolling={isRolling}
+            size={200}
           />
         </TouchableOpacity>
       </View>
 
-      <View style={[styles.bottomBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-          {STANDARD_DICE.map(die => {
-            const isSelected = typeof selectedDie === 'string' && selectedDie === die;
-            return (
-              <TouchableOpacity
-                key={die as string}
-                style={[
-                  styles.dieButton,
-                  isSelected && { borderBottomWidth: 3, borderBottomColor: colors.accent }
-                ]}
-                onPress={() => {
-                  setSelectedDie(die);
-                  if (!isSelected) onRoll();
-                }}
-              >
-                <Text style={[
-                  styles.dieButtonText, 
-                  { color: isSelected ? colors.accent : colors.textSecondary },
-                  isSelected && { fontWeight: 'bold' }
-                ]}>
-                  {getDieName(die)}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-          
-          <TouchableOpacity
-            style={[
-              styles.dieButton,
-              typeof selectedDie === 'object' && selectedDie.type === 'custom' && { borderBottomWidth: 3, borderBottomColor: colors.accent }
-            ]}
-            onPress={onCustomSelected}
-          >
-            <Text style={[
-              styles.dieButtonText, 
-              { color: typeof selectedDie === 'object' ? colors.accent : colors.textSecondary },
-              typeof selectedDie === 'object' && { fontWeight: 'bold' }
-            ]}>
-              Custom
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
+      <View style={styles.bottomBar}>
+        {STANDARD_DICE.map(die => {
+          const isSelected = typeof selectedDie === 'string' && selectedDie === die;
+          const tint = isSelected ? colors.accent : colors.textSecondary;
+          return (
+            <TouchableOpacity
+              key={die as string}
+              style={styles.dieButton}
+              onPress={() => {
+                setSelectedDie(die);
+                onRoll();
+              }}
+            >
+              <DieShape dieType={die} size={34} color={tint} />
+              <Text style={[styles.dieButtonText, { color: tint }]}>
+                {getDieName(die).toUpperCase()}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </View>
   );
@@ -102,9 +75,8 @@ function getSidesFromDie(dieType: DieType): number {
       case 'd20': return 20;
       case 'd100': return 100;
     }
-  } else {
-    return dieType.sides;
   }
+  return typeof dieType === 'object' ? dieType.sides : 20;
 }
 
 const styles = StyleSheet.create({
@@ -116,21 +88,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  bottomBar: {
-    height: 80,
-    borderTopWidth: 1,
-    justifyContent: 'center',
+  dieLabel: {
+    fontSize: 30,
+    fontWeight: '600',
+    marginBottom: 8,
   },
-  scrollContent: {
-    paddingHorizontal: 10,
-    alignItems: 'center',
+  bottomBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
+    paddingHorizontal: 8,
+    paddingBottom: 24,
   },
   dieButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    marginHorizontal: 5,
+    alignItems: 'center',
+    paddingHorizontal: 2,
   },
   dieButtonText: {
-    fontSize: 18,
-  }
+    fontSize: 13,
+    fontWeight: '600',
+    marginTop: 6,
+  },
 });
