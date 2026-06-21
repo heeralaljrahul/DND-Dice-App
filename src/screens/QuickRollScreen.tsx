@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, Text } from 'react-native';
 import { DieFaceView } from '../components/DieFaceView';
-import { DieType, getDieName } from '../models/DieType';
+import { DieType, RollResult, getDieName } from '../models/DieType';
 import { useTheme } from '../theme/ThemeContext';
 
 interface QuickRollScreenProps {
   selectedDie: DieType;
   setSelectedDie: (die: DieType) => void;
-  currentResult: { value: number; components?: number[] } | null;
+  currentResult: RollResult | null;
   isRolling: boolean;
   onRoll: () => void;
   onCustomSelected: () => void; // Will trigger mode change or prompt
@@ -35,7 +35,7 @@ export const QuickRollScreen: React.FC<QuickRollScreenProps> = ({
         >
           <DieFaceView 
             dieType={selectedDie} 
-            value={currentResult?.value ?? getSidesFromDie(selectedDie)} 
+            value={currentResult?.total ?? getSidesFromDie(selectedDie)}
             components={currentResult?.components}
             isRolling={isRolling} 
             size={180} 
