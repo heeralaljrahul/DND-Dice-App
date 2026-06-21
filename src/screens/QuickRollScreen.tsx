@@ -8,7 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
+import { impact, ImpactFeedbackStyle } from '../utils/haptics';
 import { DieFaceView } from '../components/DieFaceView';
 import { DieShape } from '../components/DieShape';
 import { DieType, RollResult, getDieName } from '../models/DieType';
@@ -48,7 +48,7 @@ export const QuickRollScreen: React.FC<QuickRollScreenProps> = ({
 
   const adjustQuantity = (amount: number) => {
     setQuantity(prev => Math.max(1, Math.min(MAX_QUANTITY, prev + amount)));
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    impact(ImpactFeedbackStyle.Light);
   };
 
   const selectDie = (die: DieType) => {

@@ -9,7 +9,7 @@ import Animated, {
   withSequence,
   cancelAnimation,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { impact, notify, ImpactFeedbackStyle, NotificationFeedbackType } from '../utils/haptics';
 import { DieType, getSides } from '../models/DieType';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -41,7 +41,7 @@ export const DieFaceView: React.FC<DieFaceViewProps> = ({
   useEffect(() => {
     if (isRolling) {
       // 1. Start haptic
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      impact(ImpactFeedbackStyle.Medium);
 
       // 2. Bounce the number
       scale.value = withSequence(
@@ -79,14 +79,14 @@ export const DieFaceView: React.FC<DieFaceViewProps> = ({
       // Check for natural 20 or 1
       if (dieType === 'd20') {
         if (value === 20) {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          notify(NotificationFeedbackType.Success);
         } else if (value === 1) {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          notify(NotificationFeedbackType.Error);
         } else {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          impact(ImpactFeedbackStyle.Light);
         }
       } else {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        impact(ImpactFeedbackStyle.Light);
       }
     }
 
